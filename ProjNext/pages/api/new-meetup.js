@@ -1,5 +1,5 @@
 //api/new-meetup
-
+import { PASSWORD } from "..";
 const { MongoClient } = require("mongodb");
 // const uri = "mongodb+srv://mcartera:flyiq440@cluster0.o8jgq.mongodb.net/meetupsDB?retryWrites=true&w=majority";
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -26,7 +26,7 @@ async function handler(req, res) {
 
     console.log(result);
     client.close();
-    res.status(201).json({message: "Meetup inserted"});
+    res.status(201).json({message: "Meetup inserted"}); 
   }
 }
 export default handler;

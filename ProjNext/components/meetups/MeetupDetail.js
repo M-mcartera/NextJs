@@ -6,12 +6,12 @@ function MeetupDetail(props) {
   return (
     <section className={styles.detail}>
       <img
-        src={props.imgSrc}
-        alt={props.imgAlt}
+        src={props.image}
+        alt={props._id}
       />
       <h1>{props.title}</h1>
       <address>{props.address}</address>
-      <p>{props.detail}</p>
+      <p>{props.details}</p>
     </section>
   );
 }

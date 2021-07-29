@@ -1,54 +1,67 @@
-import MeetupDetail from "../../components/meetups/MeetupDetail";
+import { MongoClient, ObjectId } from 'mongodb';
 
-function MeetupDetails() {
+import MeetupDetail from '../../components/meetups/MeetupDetail';
+
+function MeetupDetails(props) {
   return (
     <MeetupDetail
-      imgSrc="https://img.xcitefun.net/users/2014/07/359037,xcitefun-sunset-beach-6.jpg"
-      imgAlt="some alt"
-      title="some title"
-      address="some address"
-      detail="some details"
+      image={props.meetupData.image}
+      title={props.meetupData.title}
+      address={props.meetupData.address}
+      description={props.meetupData.description}
     />
   );
 }
+
 export async function getStaticPaths() {
+  const client = await MongoClient.connect(
+    "mongodb+srv://mcartera:pastelevine@cluster0.o8jgq.mongodb.net/meetupsDB?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+
+  client.close();
+
   return {
-    paths: [
-      {
-        params: {
-          meetupId: "m1",
-        },
-      },
-      {
-        params: {
-          meetupId: "m2",
-        },
-      },
-      {
-        params: {
-          meetupId: "m3",
-        },
-      },
-    ],
     fallback: false,
+    paths: meetups.map((meetup) => ({
+      params: { meetupId: meetup._id.toString() },
+    })),
   };
 }
 
 export async function getStaticProps(context) {
-  console.log(context.params.meetupId);
+  // fetch data for a single meetup
+
   const meetupId = context.params.meetupId;
+
+  const client = await MongoClient.connect(
+    "mongodb+srv://mcartera:pastelevine@cluster0.o8jgq.mongodb.net/meetupsDB?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: ObjectId(meetupId),
+  });
+
+  client.close();
+
   return {
     props: {
       meetupData: {
-        imgSrc:
-          "https://img.xcitefun.net/users/2014/07/359037,xcitefun-sunset-beach-6.jpg",
-        id: meetupId,
-        imgAlt: "some alt",
-        title: "some title",
-        address: "some address",
-        detail: "some details",
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        image: selectedMeetup.image,
+        description: selectedMeetup.description,
       },
     },
   };
 }
+
 export default MeetupDetails;
